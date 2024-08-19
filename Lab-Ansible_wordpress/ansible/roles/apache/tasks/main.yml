@@ -1,0 +1,35 @@
+---
+- name: Install and configure Apache
+  apt:
+    name:
+      - apache2
+      - ghostscript
+      - libapache2-mod-php
+      - php
+      - php-bcmath
+      - php-curl
+      - php-imagick
+      - php-intl
+      - php-json
+      - php-mbstring
+      - php-mysql
+      - php-xml
+      - php-zip
+    state: present
+
+- name: Remove default Apache site configuration
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+
+- name: Copy WordPress Apache site configuration
+  template:
+    src: wordpress.conf.j2
+    dest: /etc/apache2/sites-available/wordpress.conf
+
+- name: Create symbolic link for WordPress Apache site configuration
+  file:
+    src: /etc/apache2/sites-available/wordpress.conf
+    dest: /etc/apache2/sites-enabled/wordpress.conf
+    state: link
+  notify: restart apache

@@ -1,0 +1,27 @@
+---
+- name: Install MySQL server
+  apt:
+    name: mysql-server
+    state: present
+
+- name: Ensure MySQL service is running and enabled
+  systemd:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Create WordPress database
+  command: "/usr/bin/mysql -e 'CREATE DATABASE IF NOT EXISTS wordpress;'"
+  become_user: root
+
+- name: Create WordPress user
+  command: "/usr/bin/sudo /usr/bin/mysql -e \"CREATE USER 'wordpress'@'localhost' IDENTIFIED BY 'wordpresspass';\""
+
+- name: Grant privileges to WordPress user
+  command: "/usr/bin/mysql -e 'GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER ON wordpress.* TO wordpress@localhost;'"
+
+- name: Flush privileges
+  command: "/usr/bin/mysql -e 'FLUSH PRIVILEGES;'"
+
+- name: Start MySQL service
+  command: "/usr/sbin/service mysql start"
